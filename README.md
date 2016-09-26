@@ -58,8 +58,11 @@ ol.cut.cutLine
 Is always an object with the following properties:
 
 **type** *string* Can be either 'parallel' or 'meridian'.
+
 **deg** *number* The metargraticule line to be cut
+
 **from** *number*
+
 **to** *number* The affected interval. From must be less than to.
 
 
@@ -69,10 +72,66 @@ Examples
 Direct aspects in these examples were created using the ol.proj.addCoordinateTransforms method. See Openlayers documentation.
 Following code only shows commands related to this plugin.
 
+###Simple rotation
+
 ```javascript
 var src = new ol.source.Vector();
 var rotatedWagner9 = ol.proj.rotateProjection('wagner9', 125, 65, 90, 'wagner9rot', 'meta1');
-src.addFeatures((new ol.format.GeoJSON()).readCutFeatures(json, {dataProjection: 'EPSG:4326', featureProjection: 'wagner9rot'}, 'meta1'));
+src.addFeatures((new ol.format.GeoJSON()).readCutFeatures(json, {
+	dataProjection: 'EPSG:4326',
+	featureProjection: 'wagner9rot'
+}, 'meta1'));
 ```
 
 ![Wagner IX.](img/aitoffwagner.png)
+
+### Twilight-projection
+
+```javascript
+var src = new ol.source.Vector();
+var rotAzim = ol.proj.rotateProjection('vertperspective', 10, 23.5, 0, 'twilight', 'meta2');
+src.addFeatures((new ol.format.GeoJSON()).readCutFeatures(json, {
+	dataProjection: 'EPSG:4326',
+	featureProjection: 'twilight'
+}, 'meta2', true, [
+	{type: 'parallel', deg: -45.58469140280703, from: -180, to: 180}
+]));
+```
+
+![James](img/james.png)
+
+### Interrupted projection with antimeridian <> 180°
+
+```javascript
+var src = new ol.source.Vector();
+var boggsMidmeridian = ol.proj.rotateProjection('boggs', 0, 90, 10, 'boggsalt', 'meta3');
+src.addFeatures((new ol.format.GeoJSON()).readCutFeatures(json, {
+	dataProjection: 'EPSG:4326',
+	featureProjection: 'boggsalt'
+}, 'meta3', false, [
+	{type: 'meridian', deg: -40, from: 0, to: 90},
+	{type: 'meridian', deg: -100, from: -90, to: 0},
+	{type: 'meridian', deg: -20, from: -90, to: 0},
+	{type: 'meridian', deg: 80, from: -90, to: 0}
+]));
+```
+
+![Boggs](img/boggs.png)
+
+### Star-shaped projection
+
+```javascript
+var src = new ol.source.Vector();
+var rotatedOlsson = ol.proj.rotateProjection('williamolsson', -20, 75, 0, 'olssonrot', 'meta4');
+src.addFeatures((new ol.format.GeoJSON()).readCutFeatures(json, {
+	dataProjection: 'EPSG:4326',
+	featureProjection: 'olssonrot'
+}, 'meta4', true, [
+	{type: 'meridian', deg: 180, from: -90, to: 20},
+	{type: 'meridian', deg: -90, from: -90, to: 20},
+	{type: 'meridian', deg: 0, from: -90, to: 20},
+	{type: 'meridian', deg: 90, from: -90, to: 20}
+]));
+```
+
+![Olsson](img/olsson.png)
