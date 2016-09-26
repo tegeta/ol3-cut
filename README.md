@@ -37,7 +37,7 @@ Acts as readFeature() but cuts features at antimeridian and optional other arbit
 
 **source** *Document|Node|Object|string* Source.
 
-**opt_options** *olx.format.ReadOptions*  Read options.
+**opt_options** *olx.format.ReadOptions*  Read options. See Openlayers documentation.
 
 **opt_metaName** *ol.proj.ProjectionLike|undefined*  SRS of the metagraticule created with ol.proj.rotateProjection.
 Required when the destination projection is in oblique aspect or the midmeridian is not Greenwich. Default EPSG:4326.
@@ -47,11 +47,32 @@ If used, please set featureProjection in the read options to the projection crea
 Default is false. Only set true for azimuthal projections (eg. Lambert Azimuthal or Berghaus star).
 
 **opt_cutLines** *Array.\<ol.cut.CutLine\>|undefined*  If the projection has additional boundary cuts following any metagraticule line
-(eg. Goode or Berghaus), specify them here. Antimeridian and pole line cuts are automatic, must not be included. Default: empty array.
+(eg. Goode or Berghaus), specify them here. Antimeridian and pole line cuts are automatic, must not be included. Default: empty array. Further information below.
 
 **_return_** *Array.\<ol.Feature\>* Features.
+
+```javascript
+ol.cut.cutLine
+```
+
+Is always an object with the following properties:
+
+**type** *string* Can be either 'parallel' or 'meridian'.
+**deg** *number* The metargraticule line to be cut
+**from** *number*
+**to** *number* The affected interval. From must be less than to.
+
 
 Examples
 --------
 
-TODO
+Direct aspects in these examples were created using the ol.proj.addCoordinateTransforms method. See Openlayers documentation.
+Following code only shows commands related to this plugin.
+
+```javascript
+var src = new ol.source.Vector();
+var rotatedWagner9 = ol.proj.rotateProjection('wagner9', 125, 65, 90, 'wagner9rot', 'meta1');
+src.addFeatures((new ol.format.GeoJSON()).readCutFeatures(json, {dataProjection: 'EPSG:4326', featureProjection: 'wagner9rot'}, 'meta1'));
+```
+
+![Wagner IX.](img/aitoffwagner.png)
